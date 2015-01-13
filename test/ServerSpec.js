@@ -63,7 +63,7 @@ describe('', function() {
 
     var requestWithSession = request.defaults({jar: true});
 
-    xbeforeEach(function (done){      // create a user that we can then log-in with
+    beforeEach(function (done){      // create a user that we can then log-in with
       new User({
           'username': 'Phillip',
           'password': 'Phillip'
@@ -81,6 +81,9 @@ describe('', function() {
         requestWithSession(options, function(error, res, body) {
           done();
         });
+      })
+      .catch(function(err) {
+        console.log('beforeEach catch error', err);
       });
     });
 
@@ -110,6 +113,14 @@ describe('', function() {
           'url': 'http://www.roflzoo.com/'
         }
       };
+
+      var Sasha = new User({'username': 'Sasha', 'password': 'shmoosh'}).save()
+      .then(function(res) {
+        console.log('HERE BE UR RESULT YARGGG', res);
+      })
+      .catch(function(err) {
+        console.log('LOLOLOLOLOL ERRRRRR', err)
+      });
 
       it('Responds with the short code', function(done) {
         requestWithSession(options, function(error, res, body) {
