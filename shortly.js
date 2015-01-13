@@ -49,6 +49,7 @@ function(req, res) {
 app.post('/links',
 function(req, res) {
   var uri = req.body.url;
+  console.log('post to links');
 
   if (!util.isValidUrl(uri)) {
     console.log('Not a valid url: ', uri);
@@ -78,6 +79,23 @@ function(req, res) {
       });
     }
   });
+});
+
+app.post('/login',
+function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+  var user = new User({username: username, password: password})
+  .save()
+  .then(function(){
+    console.log('booyah!'.toUpperCase());
+    Users.add(user);
+    res.send(201, user);
+  })
+  .catch(function(err) {
+    console.log(err);
+  });
+
 });
 
 /************************************************************/
