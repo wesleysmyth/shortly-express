@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
@@ -22,11 +23,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+app.use(session({
+  secret: 'longundecipherablestring',
+  resave: false,
+  saveUninitialized: true
+}));
 
 app.get('/',
 function(req, res) {
-  // res.redirect(301, '/login');
-  res.render('index');
+  // check if user is logged in
+  util.checkUser(req, res, function() {
+    res.render('index');
+  })
 });
 
 app.get('/create',
