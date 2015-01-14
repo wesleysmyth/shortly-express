@@ -17,7 +17,6 @@ var User = db.Model.extend({
     bcrypt.hash(obj.password, null, null, function(err, hash) {
       // Store hash in your password DB.
       context.set('password', hash);
-      // console.log(hash);
     });
   },
 

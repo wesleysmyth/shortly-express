@@ -31,15 +31,16 @@ app.use(session({
 
 app.get('/',
 function(req, res) {
-  // check if user is logged in
   util.checkUser(req, res, function() {
     res.render('index');
-  })
+  });
 });
 
 app.get('/create',
 function(req, res) {
-  res.render('index');
+  util.checkUser(req, res, function() {
+    res.render('index');
+  });
 });
 
 app.get('/login',
@@ -47,17 +48,25 @@ function(req, res) {
   res.render('login');
 });
 
+app.get('/signup',
+function(req, res) {
+  res.render('signup');
+});
+
 app.get('/links',
 function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
+  util.checkUser(req, res, function() {
+    Links.reset().fetch().then(function(links) {
+      res.render('index');
+      res.send(200, links.models);
+    });
   });
 });
 
 app.post('/links',
 function(req, res) {
   var uri = req.body.url;
-  console.log('post to links');
+  console.log('post to links', uri);
 
   if (!util.isValidUrl(uri)) {
     console.log('Not a valid url: ', uri);
@@ -94,11 +103,38 @@ function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
   var user = new User({username: username, password: password})
-  .save()
-  .then(function(){
+  .fetch()
+  .then(function(user){
     console.log('booyah!'.toUpperCase());
+
+    if (!user) {
+      return res.redirect('/login');
+    }
+    // Users.add(user);
+    bcrypt.compare(password, user.get('password'), function(err, match){
+      if (match) {
+        util.createSession();
+      } else {
+        res.redirect('/login')
+      }
+    });
+  })
+  .catch(function(err) {
+    console.log(err);
+  });
+
+});
+
+app.post('/signup',
+function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+  var user = new User({username: username, password: password})
+  .save()
+  .then(function(user){
     Users.add(user);
-    res.send(201, user);
+    // also create a session for the user
+    util.createSession(req, res, user);
   })
   .catch(function(err) {
     console.log(err);

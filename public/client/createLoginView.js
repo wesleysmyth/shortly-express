@@ -1,4 +1,4 @@
-Shortly.createLinkView = Backbone.View.extend({
+Shortly.createLoginView = Backbone.View.extend({
   className: 'creator',
 
   template: Templates['login'],
